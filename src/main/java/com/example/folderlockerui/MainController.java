@@ -175,17 +175,36 @@ public class MainController implements Initializable {
     }
 
     @FXML
-    void setHideFolder() throws Exception {
+    void SetHideFolder() throws Exception {
+        passText = encrypted ? password.getText() : newPassword.getText();
+
+        if (passText == null || passText.isEmpty()) {
+            RaiseAlert("Write the password first.");
+
+            return;
+        }
+
         //locate the full path to the file
         Path p = Paths.get(filePath);
 
-        //hide the Log file
-        Files.setAttribute(p, "dos:hidden", true);
+        if (encrypted) {
+            if (files.get(filePath).equals(passText)) {
+                //unhide the Log file
+                Files.setAttribute(p, "dos:hidden", false);
+                fileDeleted = true;
+            } else {
+                RaiseAlert("Wrong password!");
+            }
+        } else {
+            //hide the Log file
+            Files.setAttribute(p, "dos:hidden", true);
+            fileCreated = true;
+        }
 
         //link file to DosFileAttributes
         DosFileAttributes dos = Files.readAttributes(p, DosFileAttributes.class);
 
-        System.out.println(dos.isHidden());
+        RenewVariables();
     }
 
     @FXML
